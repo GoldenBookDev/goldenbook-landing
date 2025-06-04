@@ -1,20 +1,5 @@
 // netlify/functions/establishment.js
-import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-
-const firebaseConfig = {
-  apiKey: "AIzaSyCeWEBIzPHaNv_6LSFUfQFJatH85uwoMgg",
-  authDomain: "goldenbook-a1cd1.firebaseapp.com",
-  projectId: "goldenbook-a1cd1",
-  storageBucket: "goldenbook-a1cd1.appspot.com",
-  messagingSenderId: "659096031354",
-  appId: "1:659096031354:android:29260c886aa50f65f86bc3"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-
-export async function handler(event, context) {
+exports.handler = async (event, context) => {
   const path = event.path;
   const pathParts = path.split('/');
   const establishmentId = pathParts[pathParts.indexOf('establishment') + 1];
@@ -22,27 +7,38 @@ export async function handler(event, context) {
   if (!establishmentId) {
     return {
       statusCode: 404,
-      body: 'Establishment not found'
+      headers: { 'Content-Type': 'text/html' },
+      body: generateHTML(null, null)
     };
   }
 
   try {
-    // Obtener datos del establecimiento
-    const docRef = doc(db, 'establishments', establishmentId);
-    const docSnap = await getDoc(docRef);
-
+    // Llamar a Firestore REST API (sin autenticación para lectura pública)
+    const firestoreUrl = `https://firestore.googleapis.com/v1/projects/goldenbook-a1cd1/databases/(default)/documents/establishments/${establishmentId}`;
+    
+    const response = await fetch(firestoreUrl);
     let establishment = null;
-    if (docSnap.exists()) {
-      establishment = docSnap.data();
+    
+    if (response.ok) {
+      const doc = await response.json();
+      if (doc.fields) {
+        // Convertir formato de Firestore a objeto normal
+        establishment = {};
+        Object.keys(doc.fields).forEach(key => {
+          const field = doc.fields[key];
+          if (field.stringValue) establishment[key] = field.stringValue;
+          if (field.arrayValue) establishment[key] = field.arrayValue.values?.map(v => v.stringValue) || [];
+        });
+      }
     }
 
-    // Generar HTML con meta tags
     const html = generateHTML(establishment, establishmentId);
     
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'text/html',
+        'Cache-Control': 'public, max-age=3600'
       },
       body: html,
     };
@@ -51,9 +47,7 @@ export async function handler(event, context) {
     const html = generateHTML(null, establishmentId);
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'text/html',
-      },
+      headers: { 'Content-Type': 'text/html' },
       body: html,
     };
   }
@@ -76,7 +70,7 @@ function generateHTML(establishment, establishmentId) {
     }
   }
 
-  const url = `https://meek-toffee-0a1ea2.netlify.app/establishment/${establishmentId}`;
+  const url = `https://meek-toffee-0a1ea2.netlify.app/establishment/${establishmentId || ''}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -181,37 +175,32 @@ function generateHTML(establishment, establishmentId) {
             display: block;
             margin: 10px 0;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .download-button:hover {
+            transform: translateY(-2px);
+        }
+        .footer-text {
+            color: #999; 
+            font-size: 14px; 
+            margin-top: 30px;
         }
     </style>
-    
-    <script>
-        // Redirect mobile users to app stores
-        setTimeout(() => {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-            const isAndroid = /Android/.test(navigator.userAgent);
-            
-            if (isIOS) {
-                window.location.href = 'https://apps.apple.com/app/goldenbook/id123456789';
-            } else if (isAndroid) {
-                window.location.href = 'https://play.google.com/store/apps/details?id=com.bwebstudio.goldenbook';
-            }
-        }, 3000);
-    </script>
 </head>
 <body>
     <div class="container">
         <div class="app-logo">📍</div>
         
         ${establishment ? `
-            <img src="${imageUrl}" alt="${establishment.name}" class="establishment-image">
+            <img src="${imageUrl}" alt="${establishment.name}" class="establishment-image" onerror="this.style.display='none'">
             <h1 class="establishment-name">${establishment.name.toUpperCase()}</h1>
             <p class="establishment-address">${establishment.address}, ${establishment.city}</p>
             ${establishment.categories && establishment.categories.length > 0 ? 
                 `<span class="establishment-category">${establishment.categories[0]}</span>` : ''
             }
         ` : `
-            <h1 class="establishment-name">GOLDENBOOK</h1>
-            <p class="establishment-address">Your guide to amazing places</p>
+            <h1 class="establishment-name">AMAZING PLACE</h1>
+            <p class="establishment-address">Discover this place on Goldenbook</p>
         `}
         
         <p class="subtitle">
@@ -225,10 +214,34 @@ function generateHTML(establishment, establishmentId) {
             🤖 Download for Android
         </a>
         
-        <p style="color: #999; font-size: 14px; margin-top: 30px;">
+        <p class="footer-text">
             Your guide to the best local experiences
         </p>
     </div>
+    
+    <script>
+        // Intentar abrir la app si viene de WhatsApp
+        const deepLink = 'goldenbook://establishment/${establishmentId || ''}';
+        
+        function tryOpenApp() {
+            window.location.href = deepLink;
+            setTimeout(() => {
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                const isAndroid = /Android/.test(navigator.userAgent);
+                
+                if (isIOS) {
+                    window.location.href = 'https://apps.apple.com/app/goldenbook/id123456789';
+                } else if (isAndroid) {
+                    window.location.href = 'https://play.google.com/store/apps/details?id=com.bwebstudio.goldenbook';
+                }
+            }, 2500);
+        }
+        
+        // Auto-redirect si viene de apps de chat
+        if (document.referrer && (document.referrer.includes('whatsapp') || document.referrer.includes('telegram'))) {
+            setTimeout(tryOpenApp, 1000);
+        }
+    </script>
 </body>
 </html>`;
 }

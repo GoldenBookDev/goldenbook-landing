@@ -337,7 +337,9 @@
         function updateMetaTags(establishment) {
             const name = establishment.name || 'Amazing Place';
             const title = `${name} | Goldenbook`;
-            const description = `📍 Discover ${name}${establishment.address ? ` in ${establishment.address}, ${establishment.city}` : ''}. Found on Goldenbook - your guide to the best local experiences.`;
+            
+            // Descripción más corta y directa
+            const description = `${name} in ${establishment.city || 'an amazing location'}. Discover on Goldenbook.`;
             
             let imageUrl = 'https://goldenbook.app/images/default-establishment.jpg';
             if (establishment.mainImage) {
@@ -357,7 +359,7 @@
             // Actualizar título de la página
             document.title = title;
 
-            // Actualizar meta tags Open Graph
+            // Actualizar meta tags Open Graph (más limpios)
             document.getElementById('og-title').content = title;
             document.getElementById('og-description').content = description;
             document.getElementById('og-image').content = imageUrl;

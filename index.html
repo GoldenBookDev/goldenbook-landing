@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Goldenbook - Discover Amazing Places</title>
+    
+    <!-- Meta tags que se actualizarán dinámicamente -->
+    <meta property="og:title" content="Goldenbook - Discover Amazing Places" id="og-title">
+    <meta property="og:description" content="Discover amazing places with Goldenbook" id="og-description">
+    <meta property="og:image" content="https://goldenbook.app/images/default-establishment.jpg" id="og-image">
+    <meta property="og:url" content="" id="og-url">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Goldenbook">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Goldenbook - Discover Amazing Places" id="og-image-alt">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Goldenbook" id="twitter-title">
+    <meta name="twitter:description" content="Discover amazing places" id="twitter-description">
+    <meta name="twitter:image" content="https://goldenbook.app/images/default-establishment.jpg" id="twitter-image">
+    
+    <!-- SEO básico -->
+    <meta name="description" content="Discover amazing places with Goldenbook" id="meta-description">
+    <meta name="keywords" content="travel, restaurants, local guide, places, goldenbook">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #E8A756 0%, #DAA520 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        
+        .app-logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #E8A756;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+        
+        .establishment-image {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .establishment-name {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1A1A2E;
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        
+        .establishment-address {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .establishment-category {
+            display: inline-block;
+            background: #F0F0F0;
+            color: #666;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            margin-bottom: 30px;
+            text-transform: capitalize;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+        
+        .download-button {
+            background: #E8A756;
+            color: white;
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .download-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(232, 167, 86, 0.3);
+        }
+        
+        .download-button.primary {
+            background: #1A1A2E;
+            border-color: #1A1A2E;
+        }
+        
+        .download-button.secondary {
+            background: transparent;
+            color: #E8A756;
+            border-color: #E8A756;
+        }
+        
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        
+        .error-message {
+            color: #E53935;
+            font-size: 14px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #FFEBEE;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .footer-text {
+            margin-top: 30px;
+            font-size: 14px;
+            color: #999;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .establishment-name {
+                font-size: 24px;
+            }
+            
+            .download-button {
+                padding: 14px 28px;
+                font-size: 16px;
+                display: block;
+                margin: 10px 0;
+                width: 100%;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div class="container fade-in">
+        <div class="app-logo">📍</div>
+        
+        <div id="establishment-content">
+            <img id="establishment-image" class="establishment-image" src="" alt="">
+            <h1 id="establishment-name" class="establishment-name loading">Loading amazing place...</h1>
+            <p id="establishment-address" class="establishment-address"></p>
+            <span id="establishment-category" class="establishment-category" style="display: none;"></span>
+        </div>
+        
+        <p class="subtitle">
+            Download Goldenbook to discover amazing places like this and many more!
+        </p>
+        
+        <div class="error-message" id="error-message">
+            Unable to load place details. But there are many amazing places waiting for you on Goldenbook!
+        </div>
+        
+        <div id="download-buttons">
+            <!-- Los botones se cargarán dinámicamente -->
+        </div>
+        
+        <div class="footer-text">
+            Your guide to the best local experiences
+        </div>
+    </div>
+
+    <!-- Firebase SDK v10 -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Tu configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCeWEBIzPHaNv_6LSFUfQFJatH85uwoMgg",
+            authDomain: "goldenbook-a1cd1.firebaseapp.com",
+            projectId: "goldenbook-a1cd1",
+            storageBucket: "goldenbook-a1cd1.appspot.com",
+            messagingSenderId: "659096031354",
+            appId: "1:659096031354:android:29260c886aa50f65f86bc3"
+        };
+
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Obtener ID del establecimiento de la URL
+        const pathParts = window.location.pathname.split('/');
+        const establishmentId = pathParts[pathParts.indexOf('establishment') + 1];
+
+        console.log('🔍 Buscando establecimiento:', establishmentId);
+
+        // URLs de las tiendas - ACTUALIZA ESTAS URLs CUANDO TENGAS LAS REALES
+        const APP_STORE_URL = 'https://apps.apple.com/app/goldenbook/id123456789';
+        const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.bwebstudio.goldenbook';
+
+        // Función para cargar establecimiento desde Firestore
+        async function loadEstablishment() {
+            if (!establishmentId) {
+                console.log('❌ No se encontró ID de establecimiento en la URL');
+                showDefaultContent();
+                showDownloadButtons();
+                return;
+            }
+
+            try {
+                console.log('📡 Cargando establecimiento desde Firestore...');
+                
+                // Obtener documento de Firestore - usando la colección 'establishments'
+                const docRef = doc(db, 'establishments', establishmentId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const establishment = docSnap.data();
+                    console.log('✅ Establecimiento encontrado:', establishment);
+                    
+                    // Actualizar contenido de la página
+                    updatePageContent(establishment);
+                    updateMetaTags(establishment);
+                } else {
+                    console.log('❌ Establecimiento no encontrado en Firestore');
+                    showNotFoundContent();
+                    document.getElementById('error-message').style.display = 'block';
+                }
+            } catch (error) {
+                console.error('❌ Error cargando establecimiento:', error);
+                showErrorContent();
+                document.getElementById('error-message').style.display = 'block';
+            }
+            
+            showDownloadButtons();
+        }
+
+        function updatePageContent(establishment) {
+            // Actualizar título
+            const name = establishment.name || 'Amazing Place';
+            document.getElementById('establishment-name').textContent = name;
+            document.getElementById('establishment-name').classList.remove('loading');
+            
+            // Actualizar dirección
+            if (establishment.address && establishment.city) {
+                const address = `${establishment.address}, ${establishment.city}`;
+                document.getElementById('establishment-address').textContent = address;
+            }
+            
+            // Actualizar categoría si existe
+            if (establishment.categories && establishment.categories.length > 0) {
+                const categoryElement = document.getElementById('establishment-category');
+                categoryElement.textContent = establishment.categories[0];
+                categoryElement.style.display = 'inline-block';
+            }
+            
+            // Actualizar imagen
+            if (establishment.mainImage) {
+                const img = document.getElementById('establishment-image');
+                let imageUrl = establishment.mainImage;
+                
+                // Convertir URL de Google Drive si es necesario
+                if (imageUrl.includes('drive.google.com/file/d/')) {
+                    const match = imageUrl.match(/\/d\/(.+?)\/view/);
+                    if (match && match[1]) {
+                        imageUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                    }
+                }
+                
+                console.log('🖼️ Cargando imagen:', imageUrl);
+                
+                img.onload = function() {
+                    console.log('✅ Imagen cargada exitosamente');
+                    this.style.display = 'block';
+                };
+                
+                img.onerror = function() {
+                    console.log('❌ Error cargando imagen:', imageUrl);
+                    this.style.display = 'none';
+                };
+                
+                img.src = imageUrl;
+                img.alt = name;
+            }
+        }
+
+        function updateMetaTags(establishment) {
+            const name = establishment.name || 'Amazing Place';
+            const title = `${name} | Goldenbook`;
+            const description = `📍 Discover ${name}${establishment.address ? ` in ${establishment.address}, ${establishment.city}` : ''}. Found on Goldenbook - your guide to the best local experiences.`;
+            
+            let imageUrl = 'https://goldenbook.app/images/default-establishment.jpg';
+            if (establishment.mainImage) {
+                imageUrl = establishment.mainImage;
+                if (imageUrl.includes('drive.google.com/file/d/')) {
+                    const match = imageUrl.match(/\/d\/(.+?)\/view/);
+                    if (match && match[1]) {
+                        imageUrl = `https://drive.google.com/uc?export=view&id=${match[1]}`;
+                    }
+                }
+            }
+            
+            const url = window.location.href;
+
+            console.log('🏷️ Actualizando meta tags:', { title, description, imageUrl });
+
+            // Actualizar título de la página
+            document.title = title;
+
+            // Actualizar meta tags Open Graph
+            document.getElementById('og-title').content = title;
+            document.getElementById('og-description').content = description;
+            document.getElementById('og-image').content = imageUrl;
+            document.getElementById('og-url').content = url;
+            document.getElementById('og-image-alt').content = `Photo of ${name}`;
+
+            // Actualizar Twitter Card
+            document.getElementById('twitter-title').content = title;
+            document.getElementById('twitter-description').content = description;
+            document.getElementById('twitter-image').content = imageUrl;
+
+            // Actualizar meta description
+            document.getElementById('meta-description').content = description;
+        }
+
+        function showDefaultContent() {
+            document.getElementById('establishment-name').textContent = 'Goldenbook';
+            document.getElementById('establishment-address').textContent = 'Your guide to amazing places';
+            document.getElementById('establishment-name').classList.remove('loading');
+        }
+
+        function showNotFoundContent() {
+            document.getElementById('establishment-name').textContent = 'Place Not Found';
+            document.getElementById('establishment-address').textContent = 'But discover many other amazing places!';
+            document.getElementById('establishment-name').classList.remove('loading');
+        }
+
+        function showErrorContent() {
+            document.getElementById('establishment-name').textContent = 'Amazing Place Awaits';
+            document.getElementById('establishment-address').textContent = 'Discover this and more places on Goldenbook';
+            document.getElementById('establishment-name').classList.remove('loading');
+        }
+
+        function showDownloadButtons() {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            const deepLink = `goldenbook://establishment/${establishmentId || ''}`;
+            
+            const container = document.getElementById('download-buttons');
+            
+            if (isIOS) {
+                container.innerHTML = `
+                    <a href="#" onclick="tryOpenApp('${deepLink}', '${APP_STORE_URL}')" class="download-button primary">
+                        🚀 Open in Goldenbook
+                    </a>
+                    <a href="${APP_STORE_URL}" class="download-button secondary">
+                        📱 Download on App Store
+                    </a>
+                `;
+            } else if (isAndroid) {
+                container.innerHTML = `
+                    <a href="#" onclick="tryOpenApp('${deepLink}', '${PLAY_STORE_URL}')" class="download-button primary">
+                        🚀 Open in Goldenbook
+                    </a>
+                    <a href="${PLAY_STORE_URL}" class="download-button secondary">
+                        🤖 Get on Google Play
+                    </a>
+                `;
+            } else {
+                // Desktop
+                container.innerHTML = `
+                    <a href="${APP_STORE_URL}" class="download-button">
+                        📱 Download for iOS
+                    </a>
+                    <a href="${PLAY_STORE_URL}" class="download-button">
+                        🤖 Download for Android
+                    </a>
+                `;
+            }
+        }
+
+        // Función global para intentar abrir la app
+        window.tryOpenApp = function(deepLink, storeUrl) {
+            console.log('🚀 Intentando abrir app con deep link:', deepLink);
+            
+            // Intentar abrir la app
+            window.location.href = deepLink;
+            
+            // Si no se abre en 2.5 segundos, ir a la tienda
+            setTimeout(() => {
+                console.log('🏪 App no detectada, redirigiendo a tienda:', storeUrl);
+                window.location.href = storeUrl;
+            }, 2500);
+        };
+
+        // Cargar establecimiento cuando se carga la página
+        console.log('🚀 Iniciando carga de establecimiento...');
+        loadEstablishment();
+    </script>
+</body>
+</html>

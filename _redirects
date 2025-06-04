@@ -1,6 +1,1 @@
-
-# Netlify redirects file
-# Redirigir todas las URLs de establishment a la landing page
-
-/establishment/*  /index.html  200
-/*  /index.html  200
+/establishment/* /.netlify/functions/establishment 200

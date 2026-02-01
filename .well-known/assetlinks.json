@@ -1,0 +1,15 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls",
+            "delegate_permission/common.get_login_creds"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.bwebstudio.goldenbook",
+            "sha256_cert_fingerprints": [
+                "AE:A6:C0:D4:10:2A:93:76:D8:67:E4:D3:C0:5C:D7:E1:8B:81:12:AD:86:AA:55:FA:D1:52:A3:A2:FB:C9"
+            ]
+        }
+    }
+]
